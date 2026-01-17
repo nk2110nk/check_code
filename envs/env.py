@@ -167,7 +167,7 @@ class AOPEnv(NaiveEnv):
         # インデックスからbidに変換
         self.action = {i.name: v for i, v in zip(self.issues, self.action)}
         self.my_agent.set_next_bid(self.action)
-        print(self.state['step'])
+        #print(self.state['step'])
         # 自分と相手の1ターン更新
         for _ in range(2):
             self.state = self.session.step().asdict()
