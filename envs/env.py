@@ -60,7 +60,7 @@ class NaiveEnv(gym.Env):
         if self.session is not None:
             self.session.reset()
             self.session_start = False
-        self.session.__init__(issues=self.issues, n_steps=80, avoid_ultimatum=False)
+        self.session = MySAOMechanism(issues=self.issues, n_steps=80, avoid_ultimatum=False)
         self.my_agent = RLNegotiator()
         opponent = self.get_opponent(add_noise=True)
 
@@ -167,11 +167,14 @@ class AOPEnv(NaiveEnv):
         # インデックスからbidに変換
         self.action = {i.name: v for i, v in zip(self.issues, self.action)}
         self.my_agent.set_next_bid(self.action)
+        print(self.state['step'])
         # 自分と相手の1ターン更新
         for _ in range(2):
             self.state = self.session.step().asdict()
             # 状態を更新
+            #print(self.session._current_proposer.name)
             self.observation = self.observer(self.state)
+            #print(self.session._current_proposer)
             if self.state['agreement'] is not None:  # 合意していたら
                 return self.observation, self.get_reward(), True, False, {"state":{"step":self.state['step'],"agreement":self.state["agreement"],"my_util":self.get_reward(),"opp_util":self.opp_util(tuple(v for _, v in self.state['agreement'].items())),"last_neg":self.state['last_negotiator']}}
             if self.state['timedout'] or self.state['broken']:
